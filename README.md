@@ -20,8 +20,8 @@ The components of the project involve image processing, key bindings, and calibr
 https://flutterapp.com/
 
 ##Libraries
-Python Imaging Library - adds image processing capabilities to your Python interpreter
-http://www.pythonware.com/products/pil/
+Open CV Python Bindings - adds image processing capabilities to your Python interpreter 
+http://opencv.willowgarage.com/documentation/python/
 
 PyObjC - writing Cocoa GUI applications on Mac OS X in Python
 http://pythonhosted.org/pyobjc/
