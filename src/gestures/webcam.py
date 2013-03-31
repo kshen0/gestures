@@ -2,7 +2,9 @@ import sys
 import cv2
 
 class webcam:
-    def __init__(self, cam_id=0, win_name = 'Webcam'):
+    #Constructor. cam_id is usually 0 but if you have more
+    #than 1 webcam, it might be something else 
+    def __init__(self, cam_id=0):
         #attempt to connect to the webcam
         try:
             self.cam = cv2.VideoCapture(cam_id)
