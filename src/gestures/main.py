@@ -9,7 +9,7 @@ from webcam import webcam
 from algorithm import absdiff
 from tools import show_image, stop_gui
 
-SHOW_DIFF = False
+SHOW_DIFF = True
 
 def main():
     w = webcam()
