@@ -157,13 +157,16 @@ class HandTracking:
             
     def getBoundingBoxed(self):
         return self.boundingBoxes;
-          
+
     #----------------------------------------------------------------------
     def run(self):
         ret, im = self.camera.read()
         im = cv2.flip(im, 1)
         self.imOrig = im.copy()
         self.imNoFilters = im.copy()
+
+        #Clear bounding boxes 
+        self.boundingBoxes = []
 
         #Aplica smooth
         im = cv2.blur(im, (self.Vars["smooth"], self.Vars["smooth"]))
@@ -267,12 +270,13 @@ class HandTracking:
             bounding = cv2.boundingRect(hull)
             self.boundingBoxes.append(bounding)
             
+            #cv2.circle(tempIm, (bounding[0], bounding[1]), 5,[255,0,255], 10)
 
             index_ += 1
                 
         #Rellenar el espacio filtrado de la piel menos las áreas pequeñas de un color verde :)
         cv2.drawContours(self.imOrig,contours,-1,(64,255,85),-1)
-        
+
         #Visualizar el estado anctual de los datos.
         self.debug()
         if self.debugMode: cv2.imshow("\"Hulk\" Mode", self.imOrig)
