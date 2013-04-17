@@ -155,7 +155,9 @@ class HandTracking:
         self.Vars["smooth"] = value + 1
         pickle.dump(self.Vars, open(".config", "w"))
             
-        
+    def getBoundingBoxed(self):
+        return self.boundingBoxes;
+          
     #----------------------------------------------------------------------
     def run(self):
         ret, im = self.camera.read()
