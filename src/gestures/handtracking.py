@@ -155,7 +155,7 @@ class HandTracking:
         self.Vars["smooth"] = value + 1
         pickle.dump(self.Vars, open(".config", "w"))
             
-    def getBoundingBoxed(self):
+    def getBoundingBoxes(self):
         return self.boundingBoxes;
 
     #----------------------------------------------------------------------
