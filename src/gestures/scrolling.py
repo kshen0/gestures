@@ -2,32 +2,34 @@ import sys
 import os
 import time
 
-from Quartz.CoreGraphics import CGEventCreateMouseEvent
-from Quartz.CoreGraphics import CGEventCreateKeyboardEvent
-from Quartz.CoreGraphics import CGEventCreateScrollWheelEvent
-from Quartz.CoreGraphics import CGEventPost
-from Quartz.CoreGraphics import kCGEventMouseMoved
-from Quartz.CoreGraphics import kCGEventLeftMouseDown
-from Quartz.CoreGraphics import kCGEventLeftMouseDown
-from Quartz.CoreGraphics import kCGEventLeftMouseUp
-from Quartz.CoreGraphics import kCGMouseButtonLeft
-from Quartz.CoreGraphics import kCGHIDEventTap
+from Quartz.CoreGraphics import (CGEventCreateMouseEvent,
+									CGEventCreateKeyboardEvent,
+									CGEventCreateScrollWheelEvent,
+									CGEventPost,
+									kCGEventMouseMoved,
+									kCGEventLeftMouseDown,
+									kCGEventLeftMouseDown,
+									kCGEventLeftMouseUp,
+									kCGMouseButtonLeft,
+									kCGHIDEventTap)
 
-def mouseEvent(type, posx, posy):
-        theEvent = CGEventCreateMouseEvent(None, type, (posx,posy), kCGMouseButtonLeft)
-        CGEventPost(kCGHIDEventTap, theEvent)
-
-def mousemove(posx,posy):
-	pass
+DELAY = .005
+BASE_SPEED = 4
 
 def scroll_wheel_up(num_times):
-	for i in xrange(num_times):
-		event = CGEventCreateScrollWheelEvent(None, 0, 1, 1)
+	for i in xrange(1, num_times):
+		time.sleep(DELAY)
+		multiplier = 1 - (float(i) / num_times)
+		velocity = BASE_SPEED * multiplier
+		event = CGEventCreateScrollWheelEvent(None, 0, 1, velocity)
 		CGEventPost(kCGHIDEventTap, event)
 
-def scroll_wheel_down(num_times):
-	for i in xrange(num_times):
-		event = CGEventCreateScrollWheelEvent(None, 0, 1, -1)
+def scroll_wheel_up(num_times):
+	for i in xrange(1, num_times):
+		time.sleep(DELAY)
+		multiplier = 1 - (float(i) / num_times)
+		velocity = -BASE_SPEED * multiplier
+		event = CGEventCreateScrollWheelEvent(None, 0, 1, velocity)
 		CGEventPost(kCGHIDEventTap, event)
 
 def fire_key(keycode):
@@ -37,10 +39,6 @@ def fire_key(keycode):
     CGEventPost(kCGHIDEventTap, e)
     e = CGEventCreateKeyboardEvent(None, keycode, False)
     CGEventPost(kCGHIDEventTap, e)
-
-def mouseclick(posx,posy):
-        mouseEvent(kCGEventLeftMouseDown, posx,posy)
-        mouseEvent(kCGEventLeftMouseUp, posx,posy)
 
 def main():
 	while True:
