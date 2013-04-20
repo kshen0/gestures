@@ -12,7 +12,7 @@ class Webcam:
             print 'FATAL: Cannot initialize webcam!'
             sys.exit(1)
     
-    #Gets an single frame from the camera. returns a tuple
+    #Gets a single frame from the camera. returns a tuple
     #(s, img) with s a flag indicating success or not and img
     # the image.
     def get_frame(self):

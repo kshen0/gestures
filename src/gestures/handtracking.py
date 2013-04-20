@@ -56,9 +56,12 @@ class HandTracking:
         
         self.camera = cv2.VideoCapture(0) 
         
+        self.window_width = 640
+        self.window_height = 480
+
         #Resolusión a usar
-        self.camera.set(3,640)
-        self.camera.set(4,480)
+        self.camera.set(3,self.window_width)
+        self.camera.set(4,self.window_height)
         
         self.posPre = 0  #Para obtener la posisión relativa del «mouse»
         
@@ -155,7 +158,7 @@ class HandTracking:
         self.Vars["smooth"] = value + 1
         pickle.dump(self.Vars, open(".config", "w"))
             
-    def getBoundingBoxed(self):
+    def getBoundingBoxes(self):
         return self.boundingBoxes;
 
     #----------------------------------------------------------------------
@@ -210,6 +213,27 @@ class HandTracking:
             tempIm = im.copy()
             tempIm = cv2.subtract(tempIm, im)
             
+            #Finds the bounding box of the hull
+            hull = cv2.convexHull(cnt)
+            bounding = cv2.boundingRect(hull)
+            self.boundingBoxes.append(bounding)
+            
+            # Draws pink bounding box
+            cx = bounding[0]
+            cy = bounding[1]
+            rect_w = bounding[2]
+            rect_h = bounding[3]
+
+            p0 = tuple((cx, cy))
+            p1 = tuple((cx+rect_w, cy))
+            p2 = tuple((cx+rect_w, cy+rect_h))
+            p3 = tuple((cx, cy+rect_h))
+
+            cv2.line(tempIm, p0, p1, (255, 0, 255), 5)
+            cv2.line(tempIm, p1, p2, [255, 0, 255], 5)
+            cv2.line(tempIm, p2, p3, [255, 0, 255], 5)
+            cv2.line(tempIm, p3, p0, [255, 0, 255], 5)
+
             #Para hallar convexidades (dedos)
             hull = cv2.convexHull(cnt)
             self.last = None
@@ -264,16 +288,9 @@ class HandTracking:
             
             if len(self.Data["fingers history"]) > 10: self.Data["fingers history"].pop(0)                
             self.imOrig = cv2.add(self.imOrig, tempIm)
-            
-            #Finds the bounding box of the hul
-            hull = cv2.convexHull(cnt)
-            bounding = cv2.boundingRect(hull)
-            self.boundingBoxes.append(bounding)
-            
-            #cv2.circle(tempIm, (bounding[0], bounding[1]), 5,[255,0,255], 10)
 
             index_ += 1
-                
+        
         #Rellenar el espacio filtrado de la piel menos las áreas pequeñas de un color verde :)
         cv2.drawContours(self.imOrig,contours,-1,(64,255,85),-1)
 
