@@ -25,4 +25,15 @@ def create_flow(image, flow, step_size=16):
     #draw small circles to indicate lattice points
     for (x1, y1), (x2, y2) in vectors:
         cv2.circle(flow_image, (x1, y1), 1, (0, 255, 0), -1)
+    print average_flow(flow)
     return flow_image
+
+#calculates the average flow direction of the vectors
+def average_flow(flow):
+    #make changes to flow so that only vertical information is preserved
+    vectors = []
+    for f1 in flow:
+        for f2 in f1:
+            vectors.append(f2[1])
+#print vectors
+    return np.average(vectors)
