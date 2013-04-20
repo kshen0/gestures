@@ -32,31 +32,39 @@ class Gestures():
     def __init__(self):
         #initialize the webcam
         self.camera = Webcam()
-        #initialize the handtracker
-        #self.handtracker = HandTracking()
 
         #initialize the video window
         cv2.namedWindow(WIN_NAME, cv2.CV_WINDOW_AUTOSIZE)
     
     def start(self):
         #Get 3 successive frames for difference calculation
-        frame0 = self.camera.get_frame_gray()
-        frame1 = self.camera.get_frame_gray()
-        frame2 = self.camera.get_frame_gray()
+        # frame0 = self.camera.get_frame_gray()
+        # frame1 = self.camera.get_frame_gray()
+        # frame2 = self.camera.get_frame_gray()
+
+        img0, frame0 = self.camera.get_frame_bgr_and_gray()
+        img1, frame1 = self.camera.get_frame_bgr_and_gray()
+        img2, frame2 = self.camera.get_frame_bgr_and_gray()
+
+        if USE_HANDTRACKING: #Use handtracking
+            # currently set to false, development is in progress
+            self.tracker = HandTracking()
+            pts0 = self.tracker.getBoundingPointsArray(img0)
+            pts1 = self.tracker.getBoundingPointsArray(img1)
+            pts2 = self.tracker.getBoundingPointsArray(img2)
 
         while True:
             if SHOW_OPTICAL_FLOW: #Show optical flow field
-                if USE_HANDTRACKING: #Use handtracking
-                    self.tracker = HandTracking()
-                    #get the bounding boxes of the contours
-                    print self.tracker.getBoundingBoxes()
                 #this single method does the magic of computing the optical flow
-                flow = cv2.calcOpticalFlowFarneback(
-                        frame0, frame1, 
-                        PYR_SCALE, LEVELS, WINSIZE, ITER, POLY_N, POLY_SIGMA, FLAGS)
+                flow = cv2.calcOpticalFlowFarneback(frame0, frame1, PYR_SCALE, LEVELS, WINSIZE, ITER, POLY_N, POLY_SIGMA, FLAGS)
                 image = create_flow(frame1, flow, 10) #create the flow overlay for display
+                
                 frame0 = frame1
-                frame1 = self.camera.get_frame_gray()
+                if USE_HANDTRACKING:
+                    img0 = img1
+                    img1, frame1 = self.camera.get_frame_bgr_and_gray()
+                else:
+                    frame1 = self.camera.get_frame_gray()
             elif SHOW_DIFF: #Show image difference feed
                 image = absdiff(frame0, frame1, frame2)
                 frame0 = frame1

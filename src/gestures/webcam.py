@@ -21,6 +21,8 @@ class Webcam:
     #Same get_frame except grayscale image
     def get_frame_gray(self):
         return cv2.cvtColor(self.get_frame(), cv2.COLOR_BGR2GRAY)
-    
 
-        
+    #Same get_frame except grayscale image
+    def get_frame_bgr_and_gray(self):
+        im = self.get_frame()
+        return (im, cv2.cvtColor(im, cv2.COLOR_BGR2GRAY))        

@@ -49,19 +49,19 @@ class HandTracking:
     
     #----------------------------------------------------------------------
     def __init__(self):
-        #self.debugMode = False
-        self.debugMode = True
+        self.debugMode = False
+        #self.debugMode = True
 
         #self.camera = cv2.VideoCapture(2)  #Cambiar para usar otra cámara
         
-        self.camera = cv2.VideoCapture(0) 
+        #self.camera = cv2.VideoCapture(0) 
         
         self.window_width = 640
         self.window_height = 480
 
         #Resolusión a usar
-        self.camera.set(3,self.window_width)
-        self.camera.set(4,self.window_height)
+        #self.camera.set(3,self.window_width)
+        #self.camera.set(4,self.window_height)
         
         self.posPre = 0  #Para obtener la posisión relativa del «mouse»
         
@@ -88,82 +88,69 @@ class HandTracking:
             exit()
 
         #Ventanas independientes para los filtros
-        cv2.namedWindow("Filters")
-        cv2.createTrackbar("erode", "Filters", self.Vars["erode"], 255, self.onChange_erode)
-        cv2.createTrackbar("dilate", "Filters", self.Vars["dilate"], 255, self.onChange_dilate)
-        cv2.createTrackbar("smooth", "Filters", self.Vars["smooth"], 255, self.onChange_smooth)
+        # cv2.namedWindow("Filters")
+        # cv2.createTrackbar("erode", "Filters", self.Vars["erode"], 255, self.onChange_erode)
+        # cv2.createTrackbar("dilate", "Filters", self.Vars["dilate"], 255, self.onChange_dilate)
+        # cv2.createTrackbar("smooth", "Filters", self.Vars["smooth"], 255, self.onChange_smooth)
         
-        cv2.namedWindow("HSV Filters")        
-        cv2.createTrackbar("upper", "HSV Filters", self.Vars["upper"], 255, self.onChange_upper)
-        cv2.createTrackbar("filterUpS", "HSV Filters", self.Vars["filterUpS"], 255, self.onChange_fuS)
-        cv2.createTrackbar("filterUpV", "HSV Filters", self.Vars["filterUpV"], 255, self.onChange_fuV)        
-        cv2.createTrackbar("lower", "HSV Filters", self.Vars["lower"], 255, self.onChange_lower)   
-        cv2.createTrackbar("filterDownS", "HSV Filters", self.Vars["filterDownS"], 255, self.onChange_fdS)
-        cv2.createTrackbar("filterDownV", "HSV Filters", self.Vars["filterDownV"], 255, self.onChange_fdV)
+        # cv2.namedWindow("HSV Filters")        
+        # cv2.createTrackbar("upper", "HSV Filters", self.Vars["upper"], 255, self.onChange_upper)
+        # cv2.createTrackbar("filterUpS", "HSV Filters", self.Vars["filterUpS"], 255, self.onChange_fuS)
+        # cv2.createTrackbar("filterUpV", "HSV Filters", self.Vars["filterUpV"], 255, self.onChange_fuV)        
+        # cv2.createTrackbar("lower", "HSV Filters", self.Vars["lower"], 255, self.onChange_lower)   
+        # cv2.createTrackbar("filterDownS", "HSV Filters", self.Vars["filterDownS"], 255, self.onChange_fdS)
+        # cv2.createTrackbar("filterDownV", "HSV Filters", self.Vars["filterDownV"], 255, self.onChange_fdV)
 
         #Agregar texto
-        self.addText = lambda image, text, point:cv2.putText(image,text, point, cv2.FONT_HERSHEY_PLAIN, 1.0,(255,255,255))     
+        #self.addText = lambda image, text, point:cv2.putText(image,text, point, cv2.FONT_HERSHEY_PLAIN, 1.0,(255,255,255))     
   
         #Siempre
-        while True:
-            self.run()  #Procese la imagen
+        #while True:
+            #self.run()  #Procese la imagen
             #self.interprete()  #Interprete eventos (clicks)
             #self.updateMousePos()  #Mueve el cursor
-            if self.debugMode:
-                if cv2.waitKey(1) == 27: break
+            # if self.debugMode:
+            #     if cv2.waitKey(1) == 27: break
 
-            
+
     #----------------------------------------------------------------------
-    def onChange_fuS(self, value):
-        self.Vars["filterUpS"] = value
-        pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
-    def onChange_fdS(self, value):
-        self.Vars["filterDownS"] = value
-        pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
-    def onChange_fuV(self, value):
-        self.Vars["filterUpV"] = value
-        pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
-    def onChange_fdV(self, value):
-        self.Vars["filterDownV"] = value
-        pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
-    def onChange_upper(self, value):
-        self.Vars["upper"] = value
-        pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
-    def onChange_lower(self, value):
-        self.Vars["lower"] = value
-        pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
-    def onChange_erode(self, value):
-        self.Vars["erode"] = value + 1
-        pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
-    def onChange_dilate(self, value):
-        self.Vars["dilate"] = value + 1
-        pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
-    def onChange_smooth(self, value):
-        self.Vars["smooth"] = value + 1
-        pickle.dump(self.Vars, open(".config", "w"))
-            
     def getBoundingBoxes(self):
         return self.boundingBoxes;
 
     #----------------------------------------------------------------------
-    def run(self):
-        ret, im = self.camera.read()
+    def getBoundingPoints(self, im):
+        self.run(im)
+        bounding_boxes = self.boundingBoxes
+        bounds = []
+        for box in bounding_boxes: 
+            cx = box[0]
+            cy = box[1]
+            rect_w = box[2]
+            rect_h = box[3]
+
+            p0 = tuple((cx, cy))
+            p1 = tuple((cx+rect_w, cy))
+            p2 = tuple((cx+rect_w, cy+rect_h))
+            p3 = tuple((cx, cy+rect_h))
+
+            bounds.append([p0, p1, p2, p3])
+        return bounds
+
+    #----------------------------------------------------------------------
+    def getBoundingPointsArray(self, im):
+        self.run(im)
+        arrays = []
+        for box in self.boundingBoxes: 
+            cx = box[0]
+            cy = box[1]
+            rect_w = box[2]
+            rect_h = box[3]
+
+            print im[cx][cy]
+
+    #----------------------------------------------------------------------
+    def run(self, im):
+        #ret, im = self.camera.read()
         im = cv2.flip(im, 1)
         self.imOrig = im.copy()
         self.imNoFilters = im.copy()
@@ -187,7 +174,7 @@ class HandTracking:
         
         
         #Muestra la imagen binaria
-        if self.debugMode: cv2.imshow("Filter Skin", filter_)
+        #if self.debugMode: cv2.imshow("Filter Skin", filter_)
         
         #Obtiene contornos
         contours, hierarchy = cv2.findContours(filter_,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE)
@@ -335,7 +322,52 @@ class HandTracking:
         for key in self.Data.keys():
             if self.debugMode: self.addText(self.imOrig, (key+": "+str(self.Data[key])), (yPos, pos))
             pos += 20
+
+     #----------------------------------------------------------------------
+    def onChange_fuS(self, value):
+        self.Vars["filterUpS"] = value
+        pickle.dump(self.Vars, open(".config", "w"))
         
+    #----------------------------------------------------------------------
+    def onChange_fdS(self, value):
+        self.Vars["filterDownS"] = value
+        pickle.dump(self.Vars, open(".config", "w"))
+        
+    #----------------------------------------------------------------------
+    def onChange_fuV(self, value):
+        self.Vars["filterUpV"] = value
+        pickle.dump(self.Vars, open(".config", "w"))
+        
+    #----------------------------------------------------------------------
+    def onChange_fdV(self, value):
+        self.Vars["filterDownV"] = value
+        pickle.dump(self.Vars, open(".config", "w"))
+        
+    #----------------------------------------------------------------------
+    def onChange_upper(self, value):
+        self.Vars["upper"] = value
+        pickle.dump(self.Vars, open(".config", "w"))
+        
+    #----------------------------------------------------------------------
+    def onChange_lower(self, value):
+        self.Vars["lower"] = value
+        pickle.dump(self.Vars, open(".config", "w"))
+        
+    #----------------------------------------------------------------------
+    def onChange_erode(self, value):
+        self.Vars["erode"] = value + 1
+        pickle.dump(self.Vars, open(".config", "w"))
+        
+    #----------------------------------------------------------------------
+    def onChange_dilate(self, value):
+        self.Vars["dilate"] = value + 1
+        pickle.dump(self.Vars, open(".config", "w"))
+        
+    #----------------------------------------------------------------------
+    def onChange_smooth(self, value):
+        self.Vars["smooth"] = value + 1
+        pickle.dump(self.Vars, open(".config", "w"))
+            
     #----------------------------------------------------------------------
     # def updateMousePos(self):
     #     """Actualiza la posisión del cursor."""
