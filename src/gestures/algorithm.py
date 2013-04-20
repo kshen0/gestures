@@ -38,15 +38,15 @@ def average_flow(flow):
             vectors.append(f2[1])
     result = np.average(vectors)
     #print vectors
-    if result > 2.0:
+    if result > 1.0:
         print "Strong DOWN"
-        scroll.scroll_wheel_down(20)
-    elif result > 1.0:
+        scroll.scroll_wheel_down(50)
+    elif result > 0.2:
         print "Weak DOWN"
-        scroll.scroll_wheel_down(10)
-    elif result < -1.5:
+        scroll.scroll_wheel_down(30)
+    elif result < -1.0:
         print "Strong UP"
-        scroll.scroll_wheel_up(20)
-    elif result < -0.5:
+        scroll.scroll_wheel_up(50)
+    elif result < -1.0:
         print "Weak UP"
-        scroll.scroll_wheel_up(10)
+        scroll.scroll_wheel_up(30)
