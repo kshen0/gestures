@@ -24,7 +24,7 @@ def scroll_wheel_up(num_times):
 		event = CGEventCreateScrollWheelEvent(None, 0, 1, velocity)
 		CGEventPost(kCGHIDEventTap, event)
 
-def scroll_wheel_up(num_times):
+def scroll_wheel_down(num_times):
 	for i in xrange(1, num_times):
 		time.sleep(DELAY)
 		multiplier = 1 - (float(i) / num_times)
