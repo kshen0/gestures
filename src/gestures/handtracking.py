@@ -38,7 +38,7 @@ except:
     print "need OpenCV for Python!!."
     exit()
 
-#Chequear dependencia de OpenCV 2.4
+#Check OpenCV 2.4 dependencies
 if not cv2.__version__ >= "2.4":
     print "OpenCV version to old!!."
     print "need version >= 2.4."
@@ -59,13 +59,13 @@ class HandTracking:
         self.window_width = 640
         self.window_height = 480
 
-        #Resolusión a usar
+        #Camera resolution
         #self.camera.set(3,self.window_width)
         #self.camera.set(4,self.window_height)
         
         self.posPre = 0  #Para obtener la posisión relativa del «mouse»
         
-        #Diccionario para almacenar nuestros datos
+        #Data dictionary
         self.Data = {"angles less 90" : 0,
                      "cursor" : (0, 0),
                      "hulls" : 0, 
@@ -101,10 +101,9 @@ class HandTracking:
         # cv2.createTrackbar("filterDownS", "HSV Filters", self.Vars["filterDownS"], 255, self.onChange_fdS)
         # cv2.createTrackbar("filterDownV", "HSV Filters", self.Vars["filterDownV"], 255, self.onChange_fdV)
 
-        #Agregar texto
+        #Add text
         #self.addText = lambda image, text, point:cv2.putText(image,text, point, cv2.FONT_HERSHEY_PLAIN, 1.0,(255,255,255))     
   
-        #Siempre
         #while True:
             #self.run()  #Procese la imagen
             #self.interprete()  #Interprete eventos (clicks)
