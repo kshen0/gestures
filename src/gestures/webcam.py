@@ -21,6 +21,10 @@ class Webcam:
     #Same get_frame except grayscale image
     def get_frame_gray(self):
         return cv2.cvtColor(self.get_frame(), cv2.COLOR_BGR2GRAY)
+
+    #processes the frame within the rectangles
+    def crop_frame(x, y, width, height):
+        print "blah"
     
 
         
