@@ -44,25 +44,12 @@ if not cv2.__version__ >= "2.4":
     print "need version >= 2.4."
     exit()
 
-########################################################################
+
 class HandTracking:
-    
-    #----------------------------------------------------------------------
     def __init__(self):
         self.debugMode = False
         #self.debugMode = True
 
-        #self.camera = cv2.VideoCapture(2)  #Cambiar para usar otra cámara
-        
-        #self.camera = cv2.VideoCapture(0) 
-        
-        self.window_width = 640
-        self.window_height = 480
-
-        #Camera resolution
-        #self.camera.set(3,self.window_width)
-        #self.camera.set(4,self.window_height)
-        
         self.posPre = 0  #Para obtener la posisión relativa del «mouse»
         
         #Data dictionary
@@ -74,14 +61,15 @@ class HandTracking:
                      "fingers history": [0],
                      "area": 0
                      }
+        
         #Bounding boxes for motion tracking
         self.boundingBoxes = []
 
-        #Última actualización
+        #Previous update
         self.lastData = self.Data
 
-        #Cargamos las variables de los filtros
-        #Si se modifican durante la ejecución, se actualizarán en el fichero
+        #Load filter variables
+        #If changed during execution will update in sliders
         try:  self.Vars = pickle.load(open(".config", "r"))
         except:
             print "Config file («.config») not found."
@@ -112,32 +100,8 @@ class HandTracking:
             #     if cv2.waitKey(1) == 27: break
 
 
-    #----------------------------------------------------------------------
-    def getBoundingBoxes(self):
-        return self.boundingBoxes;
-
-    #----------------------------------------------------------------------
-    def getBoundingPoints(self, im):
-        self.run(im)
-        bounding_boxes = self.boundingBoxes
-        bounds = []
-        for box in bounding_boxes: 
-            cx = box[0]
-            cy = box[1]
-            rect_w = box[2]
-            rect_h = box[3]
-
-            p0 = tuple((cx, cy))
-            p1 = tuple((cx+rect_w, cy))
-            p2 = tuple((cx+rect_w, cy+rect_h))
-            p3 = tuple((cx, cy+rect_h))
-
-            bounds.append([p0, p1, p2, p3])
-        return bounds
-
-    #----------------------------------------------------------------------
-    def getBoundingPointsArray(self, im):
-        self.run(im)
+    def getBoundingPointsArray(self, img):
+        self.run(img)
         arrays = []
         for box in self.boundingBoxes: 
             cx = box[0]
@@ -145,9 +109,10 @@ class HandTracking:
             rect_w = box[2]
             rect_h = box[3]
 
-            print im[cx][cy]
+            #print img[cx][cy]
+        return 1
 
-    #----------------------------------------------------------------------
+
     def run(self, im):
         #ret, im = self.camera.read()
         im = cv2.flip(im, 1)
@@ -285,7 +250,7 @@ class HandTracking:
         if self.debugMode: cv2.imshow("\"Hulk\" Mode", self.imOrig)
         
         
-    #----------------------------------------------------------------------
+    
     def distance(self, cent1, cent2):
         """Retorna la distancia entre dos puntos."""
         x = abs(cent1[0] - cent2[0])
@@ -293,7 +258,7 @@ class HandTracking:
         d = sqrt(x**2+y**2)
         return d
     
-    #----------------------------------------------------------------------
+    
     def angle(self, cent, rect1, rect2):
         """Retorna el ángulo formado entre tres puntos."""
         v1 = (rect1[0] - cent[0], rect1[1] - cent[1])
@@ -303,7 +268,7 @@ class HandTracking:
         angle = abs(rad2deg(angle))
         return angle
         
-    #----------------------------------------------------------------------
+    
     def filterSkin(self, im):
         """Aplica el filtro de piel."""
         UPPER = np.array([self.Vars["upper"], self.Vars["filterUpS"], self.Vars["filterUpV"]], np.uint8)
@@ -312,7 +277,7 @@ class HandTracking:
         filter_im = cv2.inRange(hsv_im, LOWER, UPPER)
         return filter_im
 
-    #----------------------------------------------------------------------
+    
     def debug(self):
         """Imprime mensaje de depuración sobre el video."""
         yPos = 10
@@ -322,51 +287,52 @@ class HandTracking:
             if self.debugMode: self.addText(self.imOrig, (key+": "+str(self.Data[key])), (yPos, pos))
             pos += 20
 
-     #----------------------------------------------------------------------
+     
     def onChange_fuS(self, value):
         self.Vars["filterUpS"] = value
         pickle.dump(self.Vars, open(".config", "w"))
         
-    #----------------------------------------------------------------------
+    
     def onChange_fdS(self, value):
         self.Vars["filterDownS"] = value
         pickle.dump(self.Vars, open(".config", "w"))
         
-    #----------------------------------------------------------------------
+
     def onChange_fuV(self, value):
         self.Vars["filterUpV"] = value
         pickle.dump(self.Vars, open(".config", "w"))
         
-    #----------------------------------------------------------------------
+
     def onChange_fdV(self, value):
         self.Vars["filterDownV"] = value
         pickle.dump(self.Vars, open(".config", "w"))
         
-    #----------------------------------------------------------------------
+
     def onChange_upper(self, value):
         self.Vars["upper"] = value
         pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
+    
+
     def onChange_lower(self, value):
         self.Vars["lower"] = value
         pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
+    
+
     def onChange_erode(self, value):
         self.Vars["erode"] = value + 1
         pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
+    
+
     def onChange_dilate(self, value):
         self.Vars["dilate"] = value + 1
         pickle.dump(self.Vars, open(".config", "w"))
-        
-    #----------------------------------------------------------------------
+    
+
     def onChange_smooth(self, value):
         self.Vars["smooth"] = value + 1
         pickle.dump(self.Vars, open(".config", "w"))
-            
+    
+
     #----------------------------------------------------------------------
     # def updateMousePos(self):
     #     """Actualiza la posisión del cursor."""
@@ -397,8 +363,3 @@ class HandTracking:
             
     #----------------------------------------------------------------------
     # 
-
-        
-
-if __name__=='__main__':
-    HandTracking()
