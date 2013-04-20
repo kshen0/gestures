@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import scrolling as scroll
 
 #Computes the absolute grayscale difference given 3 successive images
 #This detects "movements" in the video
@@ -39,9 +40,13 @@ def average_flow(flow):
     #print vectors
     if result > 2.0:
         print "Strong DOWN"
+        scroll.scroll_wheel_down(20)
     elif result > 1.0:
         print "Weak DOWN"
+        scroll.scroll_wheel_down(10)
     elif result < -1.5:
         print "Strong UP"
+        scroll.scroll_wheel_up(20)
     elif result < -0.5:
         print "Weak UP"
+        scroll.scroll_wheel_up(10)
