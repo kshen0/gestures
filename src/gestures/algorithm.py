@@ -17,7 +17,7 @@ def create_flow(image, flow, step_size=16):
     fx, fy = flow[y,x].T
     vectors = np.vstack([x, y, x+fx, y+fy]).T.reshape(-1, 2, 2)
     vectors = np.int32(vectors + 0.5)
-    
+    #print flow
     #duplicate the original image
     flow_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
     #draw all the flow vectors as lines
@@ -25,7 +25,7 @@ def create_flow(image, flow, step_size=16):
     #draw small circles to indicate lattice points
     for (x1, y1), (x2, y2) in vectors:
         cv2.circle(flow_image, (x1, y1), 1, (0, 255, 0), -1)
-    print average_flow(flow)
+    average_flow(flow)
     return flow_image
 
 #calculates the average flow direction of the vectors
@@ -35,5 +35,13 @@ def average_flow(flow):
     for f1 in flow:
         for f2 in f1:
             vectors.append(f2[1])
-#print vectors
-    return np.average(vectors)
+    result = np.average(vectors)
+    #print vectors
+    if result > 2.0:
+        print "Strong DOWN"
+    elif result > 1.0:
+        print "Weak DOWN"
+    elif result < -1.5:
+        print "Strong UP"
+    elif result < -0.5:
+        print "Weak UP"
