@@ -12,7 +12,7 @@ class Webcam:
             print 'FATAL: Cannot initialize webcam!'
             sys.exit(1)
     
-    #Gets an single frame from the camera. returns a tuple
+    #Gets a single frame from the camera. returns a tuple
     #(s, img) with s a flag indicating success or not and img
     # the image.
     def get_frame(self):
@@ -21,6 +21,10 @@ class Webcam:
     #Same get_frame except grayscale image
     def get_frame_gray(self):
         return cv2.cvtColor(self.get_frame(), cv2.COLOR_BGR2GRAY)
+
+    #processes the frame within the rectangles
+    def crop_frame(x, y, width, height):
+        print "blah"
     
 
         
