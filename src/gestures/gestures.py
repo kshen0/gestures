@@ -3,6 +3,7 @@
 
 SHOW_DIFF = False
 SHOW_OPTICAL_FLOW = True
+USE_HANDTRACKING = False
 WIN_NAME = 'Gestures'
 
 
@@ -25,6 +26,7 @@ except ImportError:
 
 from algorithm import absdiff, create_flow
 from webcam import Webcam
+from handtracking import HandTracking
 
 class Gestures():
     def __init__(self):
@@ -41,9 +43,13 @@ class Gestures():
         frame0 = self.camera.get_frame_gray()
         frame1 = self.camera.get_frame_gray()
         frame2 = self.camera.get_frame_gray()
-       
+
         while True:
             if SHOW_OPTICAL_FLOW: #Show optical flow field
+                if USE_HANDTRACKING: #Use handtracking
+                    self.tracker = HandTracking()
+                    #get the bounding boxes of the contours
+                    print self.tracker.getBoundingBoxes()
                 #this single method does the magic of computing the optical flow
                 flow = cv2.calcOpticalFlowFarneback(
                         frame0, frame1, 
