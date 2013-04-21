@@ -1,3 +1,17 @@
+import sys, pdb
+
+try: import cv2
+except ImportError:
+    print 'FATAL: Failed to find opencv'
+    sys.exit(1)
+
+import cv
+import numpy as np
+from algorithm import absdiff, create_flow
+from webcam import Webcam
+from handtracking import HandTracking
+
+
 #WINDOW PROPERTIES
 WIN_NAME = 'Gestures'
 
@@ -15,16 +29,6 @@ POLY_N = 5
 POLY_SIGMA = 1.2
 FLAGS = 0
 
-import sys
-try: import cv2
-except ImportError:
-    print 'FATAL: Failed to find opencv'
-    sys.exit(1)
-
-from algorithm import absdiff, create_flow
-from webcam import Webcam
-from handtracking import HandTracking
-
 
 class Gestures():
     def __init__(self):
@@ -35,41 +39,62 @@ class Gestures():
         cv2.namedWindow(WIN_NAME, cv2.CV_WINDOW_AUTOSIZE)
 
         #start collecting frames for processing
-        self.initFrames()
+        self.init_frames()
 
 
     def start(self):
         """Runs image processing loop"""
         while True:
+            # pdb.set_trace()
             if USE_HANDTRACKING: 
-                pass
-            if SHOW_OPTICAL_FLOW: #Show optical flow field
+                #p0 = np.float32([tr[-1] for tr in self.fts0[0]]).reshape(-1, 1, 2)
+                points, status, errors = cv.CalcOpticalFlowPyrLK (
+                    self.frame0,
+                    self.frame1,
+                    self.pyr0,
+                    self.pyr1,
+                    self.fts0[0],
+                    self.fts1[0],
+                    #WINSIZE,
+                    LEVELS,
+                    #cvTermCriteria( CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, .3 ),
+                    #(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03),
+                    (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 10, 0.01),
+                    0)
+                print points
+
+            elif SHOW_OPTICAL_FLOW: #Show optical flow field
                 #this single method does the magic of computing the optical flow
                 flow = cv2.calcOpticalFlowFarneback(
-                        self.frame0, self.frame1, 
-                        PYR_SCALE, LEVELS, WINSIZE, 
-                        ITER, POLY_N, POLY_SIGMA, FLAGS)
+                        self.frame0, 
+                        self.frame1, 
+                        PYR_SCALE, 
+                        LEVELS, 
+                        WINSIZE, 
+                        ITER, 
+                        POLY_N, 
+                        POLY_SIGMA, 
+                        FLAGS)
                 image = create_flow(self.frame1, flow, 10) #create the flow overlay for display
             elif SHOW_DIFF: #Show image difference feed
-                image = absdiff(frame0, frame1, frame2)
-                frame0 = frame1
-                frame1 = frame2
-                frame2 = self.camera.get_frame_gray()
+                image = absdiff(self.frame0, self.frame1, self.frame2)
+                self.frame0 = self.frame1
+                self.frame1 = self.frame2
+                self.frame2 = self.camera.get_frame_gray()
             else: #Just show regular webcam feed
-                image = frame0
-                frame0 = self.camera.get_frame()
+                image = self.frame0
+                self.frame0 = self.camera.get_frame()
             
-            self.updateFrames()
+            self.update_frames()
             self.show_image(image)
             
-            #Quit if the user presses ESC
             key = cv2.waitKey(4)
-            if key == 27:
+            if key == 27: #Quit if the user presses ESC
                 self.stop_gui()
                 break
 
 
-    def initFrames(self):
+    def init_frames(self):
         """Initiates camera and 3 initial frames for processing"""
         #Get 3 successive frames for difference calculation
         self.img0, self.frame0 = self.camera.get_frame_bgr_and_gray()
@@ -77,21 +102,26 @@ class Gestures():
         self.img2, self.frame2 = self.camera.get_frame_bgr_and_gray()
 
         if USE_HANDTRACKING:
-            self.initHandTracking()
+            self.init_hand_tracking()
 
 
-    def initHandTracking(self):
+    def init_hand_tracking(self):
         """Initiates hand tracker and 3 initial bounding point sets"""
         #Initialize hand tracker
         self.tracker = HandTracking()
 
-        #Get 3 successive sets of bounding points
-        self.pts0 = self.tracker.getBoundingPointsArray(self.img0)
-        self.pts1 = self.tracker.getBoundingPointsArray(self.img1)
-        self.pts2 = self.tracker.getBoundingPointsArray(self.img2)
+        #Get 3 successive sets of features (feature: array of points)
+        #Each feature array is based on a frame's bounding boxes 
+        #and indicates the areas for which optical flow should be calculated
+        self.fts0 = self.tracker.getBoundingPointsArray(self.img0)
+        self.fts1 = self.tracker.getBoundingPointsArray(self.img1)
+        self.fts2 = self.tracker.getBoundingPointsArray(self.img2)
+        
+        self.pyr0 = cv.CreateImage ((640,480), cv.IPL_DEPTH_8U, 1)
+        self.pyr1 = cv.CreateImage ((640,480), cv.IPL_DEPTH_8U, 1)
 
     
-    def updateFrames(self):
+    def update_frames(self):
         """Updates frames for next loop of processing"""
         #Store old frames
         self.img0 = self.img1
@@ -100,16 +130,18 @@ class Gestures():
         #Get new rgb and grayscale frames
         self.img1, self.frame1 = self.camera.get_frame_bgr_and_gray()
         
-        #Update set of bounding points
+        #Update bounding arrays
         if USE_HANDTRACKING:
-            self.pts0 = self.pts1
-            self.pts1 = self.tracker.getBoundingPointsArray(self.img1)
+            self.fts0 = self.fts1
+            self.fts1 = self.tracker.getBoundingPointsArray(self.img1)
 
+            self.pyr0 = self.pyr1
+            self.pyr1 = cv.CreateImage ((640,480), cv.IPL_DEPTH_8U, 1)
 
     def show_image(self,img):
         """Show a GUI with the webcam feed for debugging purposes"""
         cv2.imshow(WIN_NAME, img)
-    
+
 
     def stop_gui(self):
         """Stop the webcam"""

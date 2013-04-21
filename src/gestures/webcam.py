@@ -1,5 +1,6 @@
 import sys
 import cv2
+import numpy as np
 
 class Webcam:
     #Constructor. cam_id is usually 0 but if you have more
@@ -35,6 +36,7 @@ class Webcam:
     #Return both BGR and grayscale images
     def get_frame_bgr_and_gray(self):
         img = self.get_frame()
+        img = np.asarray(img[:,:])
         return (img, cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))        
 
 
