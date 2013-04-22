@@ -46,24 +46,7 @@ class Gestures():
         """Runs image processing loop"""
         while True:
             # pdb.set_trace()
-            if USE_HANDTRACKING: 
-                #p0 = np.float32([tr[-1] for tr in self.fts0[0]]).reshape(-1, 1, 2)
-                """
-                points, status, errors = cv.CalcOpticalFlowPyrLK (
-                    self.frame0,
-                    self.frame1,
-                    self.pyr0,
-                    self.pyr1,
-                    self.fts0[0],
-                    self.fts1[0],
-                    #WINSIZE,
-                    LEVELS,
-                    #cvTermCriteria( CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, .3 ),
-                    #(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03),
-                    (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 10, 0.01),
-                    0)
-                print points
-                """
+            if USE_HANDTRACKING:
                 pass
 
             if SHOW_OPTICAL_FLOW: #Show optical flow field
@@ -95,10 +78,14 @@ class Gestures():
             calc_scroll(self.dir)
             
             key = cv2.waitKey(4)
-            if key == 27: #Quit if the user presses ESC
+            if key == 27: 
+                #Quit if the user presses ESC
                 self.stop_gui()
                 break
-
+            if key == 100: 
+                #Toggle hand tracking debug window
+                self.tracker.toggle_debug()
+                
 
 
     def init_frames(self):

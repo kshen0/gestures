@@ -47,7 +47,6 @@ if not cv2.__version__ >= "2.4":
 class HandTracking:
     def __init__(self):
         self.debugMode = False
-        #self.toggleDebug()
         
         # self.posPre = 0  #Para obtener la posisión relativa del «mouse» consider deleting this
         
@@ -91,7 +90,7 @@ class HandTracking:
         im = cv2.blur(im, (self.Vars["smooth"], self.Vars["smooth"]))
         
         #Filter the skin
-        filter_ = self.filterSkin(im)
+        filter_ = self.filter_skin(im)
  
         #Erode filter
         filter_ = cv2.erode(filter_,
@@ -264,7 +263,7 @@ class HandTracking:
         return angle
         
     
-    def filterSkin(self, im):
+    def filter_skin(self, im):
         """Aplica el filtro de piel."""
         UPPER = np.array([self.Vars["upper"], self.Vars["filterUpS"], self.Vars["filterUpV"]], np.uint8)
         LOWER = np.array([self.Vars["lower"], self.Vars["filterDownS"], self.Vars["filterDownV"]], np.uint8)
@@ -276,9 +275,8 @@ class HandTracking:
     #----------------------------------------------------------------------
     # Debugging Helpers
     #
-    def toggleDebug(self):
-        if(self.debugMode): self.debugMode = False
-        else: self.debugMode = True
+    def toggle_debug(self):
+        self.debugMode = not self.debugMode
 
         if (self.debugMode):
             #Filter and trackbar windows
@@ -298,8 +296,11 @@ class HandTracking:
             #Add text
             self.addText = lambda image, text, point:cv2.putText(image,text, point, cv2.FONT_HERSHEY_PLAIN, 1.0,(255,255,255))     
         else: 
+            print 'toggle off'
             cv2.destroyWindow("Filters")
             cv2.destroyWindow("HSV Filters")
+            cv2.destroyWindow("Filter Skin")
+            cv2.destroyWindow("\"Hulk\" Mode")
 
 
     def debug(self):
