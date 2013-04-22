@@ -325,8 +325,7 @@ class HandTracking:
                                 self.Vars["filterDownV"], 255, self.onChange_fdV)
 
             #Add text
-            self.addText = lambda image, text, point:
-                            cv2.putText(
+            self.addText = lambda image, text, point: cv2.putText(
                                 image, 
                                 text, 
                                 point, 

@@ -22,8 +22,7 @@ class Algorithm():
         #create a lattice and find the flow vector at each lattice point
         #we will be drawing these vectors. step_size determines lattice density
         height, width = image.shape[:2]
-        x = step_size/2:width:step_size].reshape(2,-1)
-        y = np.mgrid[step_size/2:height:step_size
+        y, x = np.mgrid[step_size/2:height:step_size, step_size/2:width:step_size].reshape(2,-1)
         fx, fy = flow[y,x].T
         vectors = np.vstack([x, y, x+fx, y+fy]).T.reshape(-1, 2, 2)
         vectors = np.int32(vectors + 0.5)
@@ -42,7 +41,7 @@ class Algorithm():
 
     def calc_scroll(self, dir_vector):
         """Processes direction vector and controls scrolling"""
-
+        
         if not dir_vector:
             return
 
