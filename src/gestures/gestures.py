@@ -45,9 +45,6 @@ class Gestures():
     def start(self):
         """Runs image processing loop"""
         while True:
-            if USE_HANDTRACKING:
-                pass
-
             if SHOW_OPTICAL_FLOW: #Show optical flow field
                 #this single method does the magic of computing the optical flow
                 #flow = cv2.calcOpticalFlowFarneback(
