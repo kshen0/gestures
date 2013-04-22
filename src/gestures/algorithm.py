@@ -49,7 +49,7 @@ def calc_scroll(dir_vector):
     x = dir_vector[0][0]
     y = dir_vector[0][1]
     magnitude = dir_vector[1]
-    print (x, y)
+    #print (x, y)
     if (x == 0 or abs(y / x) > 3) and magnitude > 20:
         scroll.scroll_wheel(magnitude / 20, math.copysign(1, y))
     #print vectors
