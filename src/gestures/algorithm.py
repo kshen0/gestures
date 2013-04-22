@@ -30,23 +30,23 @@ def create_flow(image, flow, step_size=16):
     return flow_image
 
 #calculates the average flow direction of the vectors
-def average_flow(flow):
+def calc_scroll(dist):
     #make changes to flow so that only vertical information is preserved
-    vectors = []
-    for f1 in flow:
-        for f2 in f1:
-            vectors.append(f2[1])
-    result = np.average(vectors)
-    #print vectors
-    if result > 1.0:
-        print "Strong DOWN"
-        scroll.scroll_wheel_down(50)
-    elif result > 0.2:
-        print "Weak DOWN"
-        scroll.scroll_wheel_down(30)
-    elif result < -1.0:
-        print "Strong UP"
-        scroll.scroll_wheel_up(50)
-    elif result < -1.0:
-        print "Weak UP"
-        scroll.scroll_wheel_up(30)
+    # vectors = []
+    # for f1 in flow:
+    #     for f2 in f1:
+    #         vectors.append(f2[1])
+    # result = np.average(vectors)
+    # #print vectors
+    # if result > 1.0:
+    #     print "Strong DOWN"
+    #     scroll.scroll_wheel_down(50)
+    # elif result > 0.2:
+    #     print "Weak DOWN"
+    #     scroll.scroll_wheel_down(30)
+    # elif result < -1.0:
+    #     print "Strong UP"
+    #     scroll.scroll_wheel_up(50)
+    # elif result < -1.0:
+    #     print "Weak UP"
+    #     scroll.scroll_wheel_up(30)

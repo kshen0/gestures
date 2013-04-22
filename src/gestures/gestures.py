@@ -94,6 +94,7 @@ class Gestures():
                 break
 
 
+
     def init_frames(self):
         """Initiates camera and 3 initial frames for processing"""
         #Get 3 successive frames for difference calculation
@@ -113,14 +114,11 @@ class Gestures():
         #Get 3 successive sets of features (feature: array of points)
         #Each feature array is based on a frame's bounding boxes 
         #and indicates the areas for which optical flow should be calculated
-        self.fts0 = self.tracker.getBoundingPointsArray(self.img0)
-        self.fts1 = self.tracker.getBoundingPointsArray(self.img1)
-        self.fts2 = self.tracker.getBoundingPointsArray(self.img2)
+        self.mpts0 = self.tracker.getBoundingMidpoints(self.img0)
+        self.mpts1 = self.tracker.getBoundingMidpoints(self.img1)
+        self.mpts2 = self.tracker.getBoundingMidpoints(self.img2)
         
-        self.pyr0 = cv.CreateImage ((640,480), cv.IPL_DEPTH_8U, 1)
-        self.pyr1 = cv.CreateImage ((640,480), cv.IPL_DEPTH_8U, 1)
 
-    
     def update_frames(self):
         """Updates frames for next loop of processing"""
         #Store old frames
@@ -132,11 +130,26 @@ class Gestures():
         
         #Update bounding arrays
         if USE_HANDTRACKING:
-            self.fts0 = self.fts1
-            self.fts1 = self.tracker.getBoundingPointsArray(self.img1)
+            self.mpts0 = self.mpts1
+            self.mpts1 = self.tracker.getBoundingMidpoints(self.img1)
+            self.dir = get_direction_vector()
 
-            self.pyr0 = self.pyr1
-            self.pyr1 = cv.CreateImage ((640,480), cv.IPL_DEPTH_8U, 1)
+
+     def get_direction_vector():
+        """Calculates the vector between the midpoints of bounding boxes."""
+        if len(self.mpts0) is not len(self.mpts1):
+            break
+
+        diffs = []
+        for i in range(len(self.mpts0)): 
+            mp0 = self.mpts0[i]
+            mp1 = self.mpts1[i]
+            diff = [a - b for a, b in zip(mp1, mp0)]
+            dist = sqrt(diff[0]**2+diff[1]**2)
+            diffs.append((diff, dist))
+        
+        return max(diffs, key=lambda a: a[1])
+
 
     def show_image(self,img):
         """Show a GUI with the webcam feed for debugging purposes"""

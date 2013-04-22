@@ -219,7 +219,7 @@ class HandTracking:
     #----------------------------------------------------------------------
     # Bounding Box Helpers
     #   
-    def getBoundingPointsArray(self, img):
+    def getBoundingMidpoints(self, img):
         """
         Returns array of points (features) based on bounding 
         boxes for which the optical flow needs to be found.
@@ -228,7 +228,7 @@ class HandTracking:
         self.run(img)
 
         #Process bounding boxes
-        features = []
+        midpoints = []
         for box in self.boundingBoxes: 
             cx = box[0]
             cy = box[1]
@@ -238,25 +238,9 @@ class HandTracking:
             mx = cx + rect_w/2
             my = cy + rect_h/2
 
-            return (mx, my)
-            # step_w = rect_w/10
-            # step_h = rect_h/10
+            midpoints.append((mx, my))
+        return midpoints
 
-
-            # array_w =int(math.ceil(rect_w/10))
-            # array_h = int(math.ceil(rect_h/10))
-
-            #points = np.empty(shape=(array_w, array_h), dtype=(int, int))
-            # points = []
-            # for w in range(rect_w/10):
-            #     for h in range(rect_h/10):
-            #         points.append((cx+w*step_w, cy+h*step_h))
-            
-            # for w in range(rect_w/10):
-            #     points[w] = [(cx+w*step_w, cy+h*step_h) for h in range(rect_h/10)] 
-
-            # features.append(np.array(points, dtype=(int, int)))  
-            #features.append(points)  
 
     def getDirectionVector():
         pass
