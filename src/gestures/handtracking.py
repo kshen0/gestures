@@ -24,7 +24,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 -------------------------------------------------------------------------"""
 
-import pickle, time, os, threading, pdb
+import pickle, time, os
 
 try: 
     import numpy as np
@@ -47,8 +47,6 @@ if not cv2.__version__ >= "2.4":
 class HandTracking:
     def __init__(self):
         self.debugMode = False
-        
-        # self.posPre = 0  #Para obtener la posisión relativa del «mouse» consider deleting this
         
         #Bounding boxes for motion tracking
         self.boundingBoxes = []
@@ -77,9 +75,8 @@ class HandTracking:
             exit()
 
 
-    def run(self, im=None):
-        if not im.any(): 
-            ret, im = self.camera.read()
+    def run(self, im):
+        """Filters and processes image to detect skin"""
 
         im = cv2.flip(im, 1)
         self.imOrig = im.copy()
@@ -96,18 +93,26 @@ class HandTracking:
  
         #Erode filter
         filter_ = cv2.erode(filter_,
-                            cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(self.Vars["erode"], self.Vars["erode"])))           
+                            cv2.getStructuringElement(
+                                cv2.MORPH_ELLIPSE,
+                                (self.Vars["erode"], self.Vars["erode"])))           
         
         #Dilate filter
         filter_ = cv2.dilate(filter_,
-                             cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(self.Vars["dilate"], self.Vars["dilate"])))
+                             cv2.getStructuringElement(
+                                cv2.MORPH_ELLIPSE,
+                                (self.Vars["dilate"], self.Vars["dilate"])))
         
         
         #Show black and white image (result after skin filtering)
         if self.debugMode: cv2.imshow("Filter Skin", filter_)
         
         #Find contours
-        contours, hierarchy = cv2.findContours(filter_,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE)
+        contours, hierarchy = cv2.findContours(
+                                filter_,
+                                cv2.RETR_LIST,
+                                cv2.CHAIN_APPROX_NONE)
+
         if self.debugMode: cv2.imshow("Filter Skin", filter_)
 
         #Eliminate spots with areas below a certain threshold
@@ -123,7 +128,8 @@ class HandTracking:
         
         allIdex = []
         index_ = 0
-        #Process each contour
+        
+        #Process each contour (ex: hand, face)
         for cnt in contours:
             self.Data["area"] = cv2.contourArea(cnt)
             
@@ -151,32 +157,27 @@ class HandTracking:
             cv2.line(tempIm, p2, p3, [255, 0, 255], 5)
             cv2.line(tempIm, p3, p0, [255, 0, 255], 5)
 
-            #Para hallar convexidades (dedos)
+            #Finds convexities (finger detection)
             hull = cv2.convexHull(cnt)
             self.last = None
             self.Data["hulls"] = 0
             for hu in hull:
-                if self.last == None: cv2.circle(tempIm, tuple(hu[0]), 10, (0,0,255), 5)
+                if self.last == None: 
+                    cv2.circle(tempIm, tuple(hu[0]), 10, (0,0,255), 5)
                 else:
                     distance = self.distance(self.last, tuple(hu[0]))
-                    if distance > 40:  #Eliminar puntos demaciado juntos
+                    #Eliminates points too close to each other
+                    if distance > 40: 
                         self.Data["hulls"] += 1
-                        #Círculos rojos
+                        #Draws red circles
                         cv2.circle(tempIm, tuple(hu[0]), 10, (0,0,255), 5)
                 self.last = tuple(hu[0])
-
-            #Momento principal, que rigue el control del cursor
-            #consider deleting this oout
-            # M = cv2.moments(cnt)
-            # centroid_x = int(M['m10']/M['m00'])
-            # centroid_y = int(M['m01']/M['m00'])
-            # cv2.circle(tempIm, (centroid_x, centroid_y), 20, (0,255,255), 10) 
-            # self.Data["cursor"] = (centroid_x, centroid_y)
             
             #Find convex hulls, will help with finger detection
-            hull = cv2.convexHull(cnt,returnPoints = False)
             angles = []
+            hull = cv2.convexHull(cnt,returnPoints = False)
             defects = cv2.convexityDefects(cnt,hull)
+            
             if defects == None: return
                 
             self.Data["defects"] = 0
@@ -205,7 +206,9 @@ class HandTracking:
             #Save finger history
             self.Data["fingers history"].append(len(b) + 1)            
             
-            if len(self.Data["fingers history"]) > 10: self.Data["fingers history"].pop(0)                
+            if len(self.Data["fingers history"]) > 10: 
+                self.Data["fingers history"].pop(0)   
+
             self.imOrig = cv2.add(self.imOrig, tempIm)
 
             index_ += 1
@@ -222,10 +225,8 @@ class HandTracking:
     # Bounding Box Helpers
     #   
     def getBoundingMidpoints(self, img):
-        """
-        Returns array of points (features) based on bounding 
-        boxes for which the optical flow needs to be found.
-        """
+        """Returns array of points (features) based on bounding boxes"""
+        
         #Process image
         self.run(img)
 
@@ -241,6 +242,7 @@ class HandTracking:
             my = cy + rect_h/2
 
             midpoints.append((mx, my))
+        
         return midpoints
 
 
@@ -258,7 +260,7 @@ class HandTracking:
     # Processing Helpers
     #
     def distance(self, cent1, cent2):
-        """Retorna la distancia entre dos puntos."""
+        """Returns the distance between two points"""
         x = abs(cent1[0] - cent2[0])
         y = abs(cent1[1] - cent2[1])
         d = sqrt(x**2+y**2)
@@ -266,19 +268,27 @@ class HandTracking:
     
     
     def angle(self, cent, rect1, rect2):
-        """Retorna el ángulo formado entre tres puntos."""
+        """Returns the angle between three points"""
         v1 = (rect1[0] - cent[0], rect1[1] - cent[1])
         v2 = (rect2[0] - cent[0], rect2[1] - cent[1])
         dist = lambda a:sqrt(a[0] ** 2 + a[1] ** 2)
-        angle = arccos((sum(map(lambda a, b:a*b, v1, v2))) / (dist(v1) * dist(v2)))
+        angle = arccos(
+            (sum(map(lambda a, b:a*b, v1, v2))) / (dist(v1) * dist(v2)))
         angle = abs(rad2deg(angle))
         return angle
         
     
     def filter_skin(self, im):
-        """Aplica el filtro de piel."""
-        UPPER = np.array([self.Vars["upper"], self.Vars["filterUpS"], self.Vars["filterUpV"]], np.uint8)
-        LOWER = np.array([self.Vars["lower"], self.Vars["filterDownS"], self.Vars["filterDownV"]], np.uint8)
+        """Apply a skin filter"""
+        UPPER = np.array([
+            self.Vars["upper"], 
+            self.Vars["filterUpS"], 
+            self.Vars["filterUpV"]], 
+            np.uint8)
+        LOWER = np.array([
+            self.Vars["lower"], 
+            self.Vars["filterDownS"], 
+            self.Vars["filterDownV"]], np.uint8)
         hsv_im = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
         filter_im = cv2.inRange(hsv_im, LOWER, UPPER)
         return filter_im
@@ -293,22 +303,38 @@ class HandTracking:
         if (self.debugMode):
             #Filter and trackbar windows
             cv2.namedWindow("Filters")
-            cv2.createTrackbar("erode", "Filters", self.Vars["erode"], 255, self.onChange_erode)
-            cv2.createTrackbar("dilate", "Filters", self.Vars["dilate"], 255, self.onChange_dilate)
-            cv2.createTrackbar("smooth", "Filters", self.Vars["smooth"], 255, self.onChange_smooth)
+            cv2.createTrackbar("erode", "Filters", 
+                                self.Vars["erode"], 255, self.onChange_erode)
+            cv2.createTrackbar("dilate", "Filters", 
+                                self.Vars["dilate"], 255, self.onChange_dilate)
+            cv2.createTrackbar("smooth", "Filters", 
+                                self.Vars["smooth"], 255, self.onChange_smooth)
             
             cv2.namedWindow("HSV Filters")        
-            cv2.createTrackbar("upper", "HSV Filters", self.Vars["upper"], 255, self.onChange_upper)
-            cv2.createTrackbar("filterUpS", "HSV Filters", self.Vars["filterUpS"], 255, self.onChange_fuS)
-            cv2.createTrackbar("filterUpV", "HSV Filters", self.Vars["filterUpV"], 255, self.onChange_fuV)        
-            cv2.createTrackbar("lower", "HSV Filters", self.Vars["lower"], 255, self.onChange_lower)   
-            cv2.createTrackbar("filterDownS", "HSV Filters", self.Vars["filterDownS"], 255, self.onChange_fdS)
-            cv2.createTrackbar("filterDownV", "HSV Filters", self.Vars["filterDownV"], 255, self.onChange_fdV)
+            cv2.createTrackbar("upper", "HSV Filters", 
+                                self.Vars["upper"], 255, self.onChange_upper)
+            cv2.createTrackbar("filterUpS", "HSV Filters", 
+                                self.Vars["filterUpS"], 255, self.onChange_fuS)
+            cv2.createTrackbar("filterUpV", "HSV Filters", 
+                                self.Vars["filterUpV"], 255, self.onChange_fuV)        
+            cv2.createTrackbar("lower", "HSV Filters", 
+                                self.Vars["lower"], 255, self.onChange_lower)   
+            cv2.createTrackbar("filterDownS", "HSV Filters", 
+                                self.Vars["filterDownS"], 255, self.onChange_fdS)
+            cv2.createTrackbar("filterDownV", "HSV Filters", 
+                                self.Vars["filterDownV"], 255, self.onChange_fdV)
 
             #Add text
-            self.addText = lambda image, text, point:cv2.putText(image,text, point, cv2.FONT_HERSHEY_PLAIN, 1.0,(255,255,255))     
+            self.addText = lambda image, text, point:
+                            cv2.putText(
+                                image, 
+                                text, 
+                                point, 
+                                cv2.FONT_HERSHEY_PLAIN, 
+                                1.0,
+                                (255,255,255))
+
         else: 
-            print 'toggle off'
             cv2.destroyWindow("Filters")
             cv2.destroyWindow("HSV Filters")
             cv2.destroyWindow("Filter Skin")
@@ -316,12 +342,16 @@ class HandTracking:
 
 
     def debug(self):
-        """Imprime mensaje de depuración sobre el video."""
+        """Print debug feedback on window if debug mode on"""
         yPos = 10
         if self.debugMode: self.addText(self.imOrig, "Debug", (yPos, 20))
         pos = 50
         for key in self.Data.keys():
-            if self.debugMode: self.addText(self.imOrig, (key+": "+str(self.Data[key])), (yPos, pos))
+            if self.debugMode: 
+                self.addText(
+                    self.imOrig, 
+                    (key+": "+str(self.Data[key])), 
+                    (yPos, pos))
             pos += 20
 
      
