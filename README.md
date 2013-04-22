@@ -20,9 +20,9 @@ numpy, a dependency of opencv, was used for determining vector fields and direct
 PyObjC and its Quartz framework were used for handling mouse events
 
 ##Installation
-Ensure dependencies are installed
-Clone the repo and cd to src/gestures
-run main.py
+Ensure dependencies are installed  
+Clone the repo and cd to src/gestures  
+run main.py  
 
 ##Similar Work
 https://flutterapp.com/
