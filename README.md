@@ -15,14 +15,14 @@ Scrolling news articles without touching the trackpad while eating messy foods w
 * pyobjc: http://pythonhosted.org/pyobjc/
 * pyobjc Quartz framework: https://pypi.python.org/pypi/pyobjc-framework-Quartz
 
-OpenCV and OpenCV2 were used to capture webcam frames and process the images. 
-numpy, a dependency of opencv, was used for determining vector fields and directinon of movement
-PyObjC and its Quartz framework were used for handling mouse events
+OpenCV and OpenCV2 were used to capture webcam frames and process the images.   
+numpy, a dependency of opencv, was used for determining vector fields and directinon of movement  
+PyObjC and its Quartz framework were used for handling mouse events  
 
 ##Installation
-Ensure dependencies are installed
-Clone the repo and cd to src/gestures
-run main.py
+Ensure dependencies are installed  
+Clone the repo and cd to src/gestures  
+run main.py  
 
 ##Similar Work
 https://flutterapp.com/
