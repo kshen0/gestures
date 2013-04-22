@@ -11,19 +11,32 @@ DELAY = .002
 
 def scroll_wheel(v0, sign, steps=200):
 	"""
-	Kinematically scrolls the window under the cursor.
+	Kinematically scrolls the window that is under the cursor by sending
+	mouse wheel scroll events.
+
+	Uses kinematic equations: 
+	http://en.wikipedia.org/wiki/Equations_of_motion#Uniform_acceleration
+
 	args: v0, the initial velocity of the scroll
 		  sign, the direction of scrolling (1 for up, -1 for down)
 		  steps, optional arg that determines duration of the scroll
 	"""
 
+	### POSITION ###
 	r, r0 = 0, 0
+
+	### VELOCITY ###
 	v = v0
-	V_CAP = v0 + 4
+	# Maximum velocity - values over 10 may cause unexpected behavior 
+	V_CAP = min(10, v0 + 4)
+	# Previous N velocities
 	v_history = []
-	accelerating = True
+
+	### ACCELERATION ###
+	# Acceleration constants
 	a = 0.15
 	decel_const = -0.02
+	accelerating = True
 
 	t = 0
 	while v > 0:
