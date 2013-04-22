@@ -19,10 +19,13 @@ OpenCV and OpenCV2 were used to capture webcam frames and process the images.
 numpy, a dependency of opencv, was used for determining vector fields and directinon of movement  
 PyObjC and its Quartz framework were used for handling mouse events  
 
-##Installation
+##Installation and usage
 Ensure dependencies are installed  
 Clone the repo and cd to src/gestures  
 run main.py  
+Move your hand up or down to scroll up or down. The scroll direction will behave according to the computer's natural scrolling setting.
+Press d to toggle debug video feed  
+Press esc to quit 
 
 ##Similar Work
 https://flutterapp.com/
