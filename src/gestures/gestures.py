@@ -7,7 +7,7 @@ except ImportError:
 
 import cv
 import numpy as np
-from algorithm import absdiff, create_flow, calc_scroll
+from algorithm import Algorithm
 from webcam import Webcam
 from handtracking import HandTracking
 
@@ -41,6 +41,9 @@ class Gestures():
         #start collecting frames for processing
         self.init_frames()
 
+        #initialize Algorithm instance
+        self.alg = Algorithm()
+
 
     def start(self):
         """Runs image processing loop"""
@@ -58,9 +61,9 @@ class Gestures():
                         # POLY_SIGMA, 
                         # FLAGS)
                 pass
-                #image = create_flow(self.frame1, flow, 10) #create the flow overlay for display
+                #image = alg.create_flow(self.frame1, flow, 10) #create the flow overlay for display
             elif SHOW_DIFF: #Show image difference feed
-                image = absdiff(self.frame0, self.frame1, self.frame2)
+                image = self.alg.absdiff(self.frame0, self.frame1, self.frame2)
                 self.frame0 = self.frame1
                 self.frame1 = self.frame2
                 self.frame2 = self.camera.get_frame_gray()
@@ -72,7 +75,7 @@ class Gestures():
             #self.show_image(image)
 
             # send scroll event
-            calc_scroll(self.dir)
+            self.alg.calc_scroll(self.dir)
             
             key = cv2.waitKey(4)
             if key == 27: 
