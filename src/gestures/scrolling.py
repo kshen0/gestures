@@ -8,42 +8,35 @@ from Quartz.CoreGraphics import (CGEventCreateScrollWheelEvent,
 									kCGHIDEventTap)
 
 DELAY = .002
-BASE_SPEED = 7
 
-def scroll_wheel_up(num_times):
-	for i in xrange(1, num_times):
-		time.sleep(DELAY)
-		multiplier = 1 - (float(i) / num_times)
-		velocitiescity = BASE_SPEED * multiplier
-		event = CGEventCreateScrollWheelEvent(None, 0, 1, velocity)
-		CGEventPost(kCGHIDEventTap, event)
+def scroll_wheel(v0, sign, steps=200):
+	"""
+	Kinematically scrolls the window under the cursor.
+	args: v0, the initial velocity of the scroll
+		  sign, the direction of scrolling (1 for up, -1 for down)
+		  steps, optional arg that determines duration of the scroll
+	"""
+	print "Scrolling with v0=%d, sign=%d, steps=%d" % (v0, sign, steps)
 
-def scroll_wheel_down(v0):
-	r0 = 	0
-	r = r0
+	r, r0 = 0, 0
 	v = v0
-	a = 0.15000
 	V_CAP = v0 + 4
-	end = 200
 	v_history = []
 	accelerating = True
+	a = 0.15
 	decel_const = -0.02
 
 	t = 0
-	i = 0
 	while v > 0:
 		# added delay for buttery smoothness
 		time.sleep(DELAY)
 
 		# update position
 		new_r = r0 + ((v + v0)/2) * t
-		scroll_dist = r - new_r
+		scroll_dist = sign * (new_r - r) 
+		r = new_r
 
 		# update velocity
-		"""
-		vsquared = max(0, v0*v0 + 2*a*(r-r0))
-		v = min(V_CAP, math.sqrt(vsquared))
-		"""
 		v = min(V_CAP, a * t + v0)
 		if v == V_CAP:
 			v0 = v
@@ -53,16 +46,12 @@ def scroll_wheel_down(v0):
 			v_history.pop(0)
 		v_history.append(v)
 
-		r = new_r
-		print v 
-
-
 		# send the mouse event
 		event = CGEventCreateScrollWheelEvent(None, 0, 1, scroll_dist)
 		CGEventPost(kCGHIDEventTap, event)
 
 		# decelerate if near the end of the time loop
-		if accelerating and t > 0.9 * end:
+		if accelerating and t > 0.9 * steps:
 			accelerating = False
 			a = decel_const 
 			v0 = int(sum(v_history) / len(v_history))
@@ -70,17 +59,6 @@ def scroll_wheel_down(v0):
 			t = 0
 
 		t += 1
-		i += 1
-	"""
-	for i in xrange(1, num_times):
-		time.sleep(DELAY)
-		m = 1 - (float(i) / num_times)
-		#velocity = -BASE_SPEED * m
-		velocity = -1 * (3*m*m + 2*m + 1)
-		print velocity
-		event = CGEventCreateScrollWheelEvent(None, 0, 1, velocity)
-		CGEventPost(kCGHIDEventTap, event)
-	"""
 
 def fire_key(keycode):
 	# Key bindings from: 
@@ -91,9 +69,14 @@ def fire_key(keycode):
     CGEventPost(kCGHIDEventTap, e)
 
 def main():
-	for i in xrange(1, 5):
+	return
+	for i in xrange(1, 3):
 		time.sleep(2)
-		scroll_wheel_down(i)
+		scroll_wheel(i, -1)
+
+	for i in xrange(1, 3):
+		time.sleep(2)
+		scroll_wheel(i, 1)
 
 if __name__ == '__main__':
 	main()
