@@ -16,7 +16,6 @@ def scroll_wheel(v0, sign, steps=200):
 		  sign, the direction of scrolling (1 for up, -1 for down)
 		  steps, optional arg that determines duration of the scroll
 	"""
-	print "Scrolling with v0=%d, sign=%d, steps=%d" % (v0, sign, steps)
 
 	r, r0 = 0, 0
 	v = v0
@@ -59,24 +58,3 @@ def scroll_wheel(v0, sign, steps=200):
 			t = 0
 
 		t += 1
-
-def fire_key(keycode):
-	# Key bindings from: 
-	#http://stackoverflow.com/questions/1918841/how-to-convert-ascii-character-to-cgkeycode
-    e = CGEventCreateKeyboardEvent(None, keycode, True)
-    CGEventPost(kCGHIDEventTap, e)
-    e = CGEventCreateKeyboardEvent(None, keycode, False)
-    CGEventPost(kCGHIDEventTap, e)
-
-def main():
-	return
-	for i in xrange(1, 3):
-		time.sleep(2)
-		scroll_wheel(i, -1)
-
-	for i in xrange(1, 3):
-		time.sleep(2)
-		scroll_wheel(i, 1)
-
-if __name__ == '__main__':
-	main()

@@ -50,12 +50,18 @@ def calc_scroll(dir_vector):
     x = dir_vector[0][0]
     y = dir_vector[0][1]
     magnitude = dir_vector[1]
+
+    """
     if x != 0:
         print y/x, magnitude
     if (x == 0 or abs(y / x) > 3) and magnitude > 100:
         speed = min(6, magnitude / 10)
         direction = math.copysign(1, y)
         scroll.scroll_wheel(speed, direction, 50)
+    """
+    #print (x, y)
+    if (x == 0 or abs(y / x) > 3) and magnitude > 20:
+        scroll.scroll_wheel(magnitude / 20, math.copysign(1, y))
     #print vectors
     """
     if result > 1.0:

@@ -61,7 +61,9 @@ class HandTracking:
             "defects" : 0,
             "fingers": 0,
             "fingers history": [0],
-            "area": 0
+            "area": 0,
+            "diff vector": (0, 0),
+            "max distance": 0
         }
 
         #Previous update
@@ -240,6 +242,16 @@ class HandTracking:
 
             midpoints.append((mx, my))
         return midpoints
+
+
+    def update_dir_data(self, dir):
+        """Updates debugging data for direction vector"""
+        if not dir: 
+            return 
+        diff = dir[0]
+        dist = dir[1]
+        self.Data["diff vector"] = "(%d, %d)" % (diff[0], diff[1])
+        self.Data["max distance"] = dist
 
 
     #----------------------------------------------------------------------

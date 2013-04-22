@@ -45,23 +45,23 @@ class Gestures():
     def start(self):
         """Runs image processing loop"""
         while True:
-            # pdb.set_trace()
             if USE_HANDTRACKING:
                 pass
 
             if SHOW_OPTICAL_FLOW: #Show optical flow field
                 #this single method does the magic of computing the optical flow
-                flow = cv2.calcOpticalFlowFarneback(
-                        self.frame0, 
-                        self.frame1, 
-                        PYR_SCALE, 
-                        LEVELS, 
-                        WINSIZE, 
-                        ITER, 
-                        POLY_N, 
-                        POLY_SIGMA, 
-                        FLAGS)
-                image = create_flow(self.frame1, flow, 10) #create the flow overlay for display
+                #flow = cv2.calcOpticalFlowFarneback(
+                        #self.frame0, 
+                        #self.frame1, 
+                        #PYR_SCALE, 
+                        #LEVELS, 
+                        # WINSIZE, 
+                        # ITER, 
+                        # POLY_N, 
+                        # POLY_SIGMA, 
+                        # FLAGS)
+                pass
+                #image = create_flow(self.frame1, flow, 10) #create the flow overlay for display
             elif SHOW_DIFF: #Show image difference feed
                 image = absdiff(self.frame0, self.frame1, self.frame2)
                 self.frame0 = self.frame1
@@ -72,7 +72,7 @@ class Gestures():
                 self.frame0 = self.camera.get_frame()
             
             self.update_frames()
-            self.show_image(image)
+            #self.show_image(image)
 
             # send scroll event
             calc_scroll(self.dir)
@@ -126,6 +126,7 @@ class Gestures():
             self.mpts0 = self.mpts1
             self.mpts1 = self.tracker.getBoundingMidpoints(self.img1)
             self.dir = self.get_direction_vector()
+            self.tracker.update_dir_data(self.dir)
 
 
     def get_direction_vector(self):
