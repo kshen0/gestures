@@ -7,7 +7,7 @@ except ImportError:
 
 import cv
 import numpy as np
-from algorithm import absdiff, create_flow
+from algorithm import absdiff, create_flow, calc_scroll
 from webcam import Webcam
 from handtracking import HandTracking
 
@@ -48,6 +48,7 @@ class Gestures():
             # pdb.set_trace()
             if USE_HANDTRACKING: 
                 #p0 = np.float32([tr[-1] for tr in self.fts0[0]]).reshape(-1, 1, 2)
+                """
                 points, status, errors = cv.CalcOpticalFlowPyrLK (
                     self.frame0,
                     self.frame1,
@@ -62,8 +63,10 @@ class Gestures():
                     (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 10, 0.01),
                     0)
                 print points
+                """
+                pass
 
-            elif SHOW_OPTICAL_FLOW: #Show optical flow field
+            if SHOW_OPTICAL_FLOW: #Show optical flow field
                 #this single method does the magic of computing the optical flow
                 flow = cv2.calcOpticalFlowFarneback(
                         self.frame0, 
@@ -87,6 +90,9 @@ class Gestures():
             
             self.update_frames()
             self.show_image(image)
+
+            # send scroll event
+            calc_scroll(self.dir)
             
             key = cv2.waitKey(4)
             if key == 27: #Quit if the user presses ESC
@@ -132,22 +138,25 @@ class Gestures():
         if USE_HANDTRACKING:
             self.mpts0 = self.mpts1
             self.mpts1 = self.tracker.getBoundingMidpoints(self.img1)
-            self.dir = get_direction_vector()
+            self.dir = self.get_direction_vector()
 
 
-     def get_direction_vector():
+    def get_direction_vector(self):
         """Calculates the vector between the midpoints of bounding boxes."""
         if len(self.mpts0) is not len(self.mpts1):
-            break
+            return
 
         diffs = []
         for i in range(len(self.mpts0)): 
             mp0 = self.mpts0[i]
             mp1 = self.mpts1[i]
             diff = [a - b for a, b in zip(mp1, mp0)]
-            dist = sqrt(diff[0]**2+diff[1]**2)
+            dist = np.sqrt(diff[0]**2+diff[1]**2)
             diffs.append((diff, dist))
-        
+            
+        if len(diffs) == 0:
+            return None 
+
         return max(diffs, key=lambda a: a[1])
 
 
