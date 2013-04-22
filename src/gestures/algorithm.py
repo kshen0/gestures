@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import scrolling as scroll
+import time
 import math
 
 #Computes the absolute grayscale difference given 3 successive images
@@ -49,9 +50,10 @@ def calc_scroll(dir_vector):
     x = dir_vector[0][0]
     y = dir_vector[0][1]
     magnitude = dir_vector[1]
-    print (x, y)
-    if (x == 0 or abs(y / x) > 3) and magnitude > 20:
-        scroll.scroll_wheel(magnitude / 20, math.copysign(1, y))
+    if (x == 0 or abs(y / x) > 3) and magnitude > 15:
+        speed = min(6, magnitude)
+        direction = math.copysign(1, y)
+        scroll.scroll_wheel(speed, direction, 50)
     #print vectors
     """
     if result > 1.0:
