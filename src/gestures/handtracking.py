@@ -24,7 +24,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 -------------------------------------------------------------------------"""
 
-import pickle, time, os, threading, math, pdb
+import pickle, time, os, threading, pdb
 
 try: 
     import numpy as np
@@ -38,7 +38,6 @@ except:
     print "need OpenCV for Python!!."
     exit()
 
-#Check OpenCV 2.4 dependencies
 if not cv2.__version__ >= "2.4":
     print "OpenCV version to old!!."
     print "need version >= 2.4."
@@ -50,7 +49,7 @@ class HandTracking:
         self.debugMode = False
         #self.toggleDebug()
         
-        self.posPre = 0  #Para obtener la posisión relativa del «mouse»
+        # self.posPre = 0  #Para obtener la posisión relativa del «mouse» consider deleting this
         
         #Bounding boxes for motion tracking
         self.boundingBoxes = []
@@ -70,7 +69,7 @@ class HandTracking:
         self.lastData = self.Data
 
         #Load filter variables
-        #If changed during execution will update in sliders
+        #If changed during execution these will update in sliders
         try:  self.Vars = pickle.load(open(".config", "r"))
         except:
             print "Config file («.config») not found."
@@ -166,11 +165,12 @@ class HandTracking:
                 self.last = tuple(hu[0])
 
             #Momento principal, que rigue el control del cursor
-            M = cv2.moments(cnt)
-            centroid_x = int(M['m10']/M['m00'])
-            centroid_y = int(M['m01']/M['m00'])
-            cv2.circle(tempIm, (centroid_x, centroid_y), 20, (0,255,255), 10) 
-            self.Data["cursor"] = (centroid_x, centroid_y)
+            #consider deleting this oout
+            # M = cv2.moments(cnt)
+            # centroid_x = int(M['m10']/M['m00'])
+            # centroid_y = int(M['m01']/M['m00'])
+            # cv2.circle(tempIm, (centroid_x, centroid_y), 20, (0,255,255), 10) 
+            # self.Data["cursor"] = (centroid_x, centroid_y)
             
             #Find convex hulls, will help with finger detection
             hull = cv2.convexHull(cnt,returnPoints = False)
@@ -186,21 +186,22 @@ class HandTracking:
                     end = tuple(cnt[e][0])
                     far = tuple(cnt[f][0])
                     self.Data["defects"] += 1
-                    cv2.circle(tempIm,far,5,[0,255,255],-1)  #Marcar lo defectos con puntos amarillos
-                    #Líneas entre convexidades y defectos
+                    #Defects marked with yellow points
+                    cv2.circle(tempIm,far,5,[0,255,255],-1) 
+                    #Draws lines between convexities and defects
                     cv2.line(tempIm, start, far, [255, 0, 0], 5) 
                     cv2.line(tempIm, far, end, [255, 0, 0], 5)
-                    #Obtener el ángulos que forman las líneas anteriores
+                    #Obtain the angles that form anterior lines
                     angles.append(self.angle(far, start, end))
 
             #Filter angles less than 90 degrees
             b = filter(lambda a:a<90, angles)
             
-            #Se asume que si son menores de 90 grados, corresponde a un dedo.          
+            #Assume angles less than 90 deg indicate a finger
             self.Data["angles less 90"] = len(b)
             self.Data["fingers"] = len(b) + 1
             
-            #Para almacenar los últimos estados de los dedos.
+            #Save finger history
             self.Data["fingers history"].append(len(b) + 1)            
             
             if len(self.Data["fingers history"]) > 10: self.Data["fingers history"].pop(0)                
@@ -208,10 +209,10 @@ class HandTracking:
 
             index_ += 1
         
-        #Rellenar el espacio filtrado de la piel menos las áreas pequeñas de un color verde :)
+        #Fill skin areas with green color
         cv2.drawContours(self.imOrig,contours,-1,(64,255,85),-1)
 
-        #Visualizar el estado anctual de los datos.
+        #Visualize data
         self.debug()
         if self.debugMode: cv2.imshow("\"Hulk\" Mode", self.imOrig)
      
@@ -240,10 +241,6 @@ class HandTracking:
 
             midpoints.append((mx, my))
         return midpoints
-
-
-    def getDirectionVector():
-        pass
 
 
     #----------------------------------------------------------------------
