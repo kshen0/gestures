@@ -19,6 +19,13 @@ OpenCV and OpenCV2 were used to capture webcam frames and process the images.
 numpy, a dependency of opencv, was used for determining vector fields and directinon of movement  
 PyObjC and its Quartz framework were used for handling mouse events  
 
+
+##Library
+* Skin Filtering and Contouring Library: http://www.youtube.com/watch?v=ycd3t6K2ofs
+
+We extended the skin filtering and contouring library to include bounding boxes which we used for our motion analysis. Some of the debugging code was also refactored so as to incorporate it into our code. Comments were also translated to English. 
+
+
 ##Installation and usage
 Ensure dependencies are installed  
 Clone the repo and cd to src/gestures  
