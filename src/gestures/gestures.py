@@ -16,8 +16,10 @@ from handtracking import HandTracking
 WIN_NAME = 'Gestures'
 
 #IMAGE PROCESSING
-SHOW_OPTICAL_FLOW = True
+# USE_OPTICAL_FLOW = True
 USE_HANDTRACKING = True
+SHOW_OPTICAL_FLOW = False
+
 SHOW_DIFF = False
 
 #OPTICAL CACULATION
@@ -34,6 +36,9 @@ class Gestures():
     def __init__(self):
         #initialize the webcam
         self.camera = Webcam()
+        
+        #initialize optical debug mode
+        self.opticalDebugMode = False
 
         #initialize the video window
         cv2.namedWindow(WIN_NAME, cv2.CV_WINDOW_AUTOSIZE)
@@ -48,30 +53,31 @@ class Gestures():
     def start(self):
         """Runs image processing loop"""
         while True:
-            if SHOW_OPTICAL_FLOW: #Show optical flow field
-                #this single method does the magic of computing the optical flow
-                #flow = cv2.calcOpticalFlowFarneback(
-                        #self.frame0, 
-                        #self.frame1, 
-                        #PYR_SCALE, 
-                        #LEVELS, 
-                        # WINSIZE, 
-                        # ITER, 
-                        # POLY_N, 
-                        # POLY_SIGMA, 
-                        # FLAGS)
-                pass
-                #image = alg.create_flow(self.frame1, flow, 10) #create the flow overlay for display
-            elif SHOW_DIFF: #Show image difference feed
-                image = self.alg.absdiff(self.frame0, self.frame1, self.frame2)
-                self.frame0 = self.frame1
-                self.frame1 = self.frame2
-                self.frame2 = self.camera.get_frame_gray()
-            else: #Just show regular webcam feed
-                image = self.frame0
-                self.frame0 = self.camera.get_frame()
-            
             self.update_frames()
+            # if USE_OPTICAL_FLOW: #Show optical flow field
+            #     #this single method does the magic of computing the optical flow
+            #     #flow = cv2.calcOpticalFlowFarneback(
+            #             #self.frame0, 
+            #             #self.frame1, 
+            #             #PYR_SCALE, 
+            #             #LEVELS, 
+            #             # WINSIZE, 
+            #             # ITER, 
+            #             # POLY_N, 
+            #             # POLY_SIGMA, 
+            #             # FLAGS)
+            #     pass
+            #     #image = alg.create_flow(self.frame1, flow, 10) #create the flow overlay for display
+            # elif SHOW_DIFF: #Show image difference feed
+            #     image = self.alg.absdiff(self.frame0, self.frame1, self.frame2)
+            #     self.frame0 = self.frame1
+            #     self.frame1 = self.frame2
+            #     self.frame2 = self.camera.get_frame_gray()
+            # else: #Just show regular webcam feed
+            #     image = self.frame0
+            #     self.frame0 = self.camera.get_frame()
+            
+            
             #self.show_image(image)
 
             # send scroll event
@@ -82,10 +88,12 @@ class Gestures():
                 #Quit if the user presses ESC
                 self.stop_gui()
                 break
-            if key == 100: 
+            if key == 104: 
                 #Toggle hand tracking debug window
                 self.tracker.toggle_debug()
-                
+            if key == 111:
+                #Toggle optical flow debug window
+                self.toggle_optical()
 
 
     def init_frames(self):
@@ -128,6 +136,20 @@ class Gestures():
             self.dir = self.get_direction_vector()
             self.tracker.update_dir_data(self.dir)
 
+        if self.opticalDebugMode: #Show optical flow field
+            flow = cv2.calcOpticalFlowFarneback(
+                    self.frame0, 
+                    self.frame1, 
+                    PYR_SCALE, 
+                    LEVELS, 
+                    WINSIZE, 
+                    ITER, 
+                    POLY_N, 
+                    POLY_SIGMA, 
+                    FLAGS)
+            image = self.alg.create_flow(self.frame1, flow, 10) #create the flow overlay for display
+            self.show_image(image)
+
 
     def get_direction_vector(self):
         """Calculates the vector between the midpoints of bounding boxes."""
@@ -146,6 +168,17 @@ class Gestures():
             return None 
 
         return max(diffs, key=lambda a: a[1])
+
+
+    def toggle_optical(self):
+        """Toggle the optical flow debug window"""
+        self.opticalDebugMode = not self.opticalDebugMode
+
+        if self.opticalDebugMode:
+            #initialize the video window
+            cv2.namedWindow(WIN_NAME, cv2.CV_WINDOW_AUTOSIZE)
+        else: 
+            self.stop_gui()
 
 
     def show_image(self,img):

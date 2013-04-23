@@ -39,6 +39,7 @@ class Algorithm():
         
         return flow_image
 
+
     def calc_scroll(self, dir_vector):
         """Processes direction vector and controls scrolling"""
         
