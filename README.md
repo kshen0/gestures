@@ -6,6 +6,20 @@ Jocelin Lee (jocelin), Gaby MorenoCesar (gmoren), Kevin Shen (kshen)
 ##Description
 We built an app that uses the webcam to track the user's hand. It translates vertical hand movments into mousewheel scroll events to programatically scroll the window under the cursor.
 
+##Installation and usage
+Install dependencies 
+Clone repo
+cd to src/gestures  
+run: python main.py  
+Hover mouse over or focus on window you wish to scroll
+Move your hand up or down to scroll up or down. The scroll direction will behave according to the computer's natural scrolling setting.
+
+###Keyboard Commands:
+* 'h': toggles hand filtering debug window
+* 'o': toggles optical flow debug window  
+* 'esc': quit 
+Note: focus on python app for keyboard commands to work
+
 ##Use cases
 Scrolling news articles without touching the trackpad while eating messy foods with your hands.
 
@@ -24,15 +38,6 @@ PyObjC and its Quartz framework were used for handling mouse events
 * Skin Filtering and Contouring Library: http://www.youtube.com/watch?v=ycd3t6K2ofs
 
 We extended the skin filtering and contouring library to include bounding boxes which we used for our motion analysis. Some of the debugging code was also refactored so as to incorporate it into our code. Comments were also translated to English. 
-
-
-##Installation and usage
-Ensure dependencies are installed  
-Clone the repo and cd to src/gestures  
-run main.py  
-Move your hand up or down to scroll up or down. The scroll direction will behave according to the computer's natural scrolling setting.
-Press d to toggle debug video feed  
-Press esc to quit 
 
 ##Similar Work
 https://flutterapp.com/

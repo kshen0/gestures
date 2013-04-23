@@ -53,36 +53,11 @@ class Gestures():
     def start(self):
         """Runs image processing loop"""
         while True:
-            self.update_frames()
-            # if USE_OPTICAL_FLOW: #Show optical flow field
-            #     #this single method does the magic of computing the optical flow
-            #     #flow = cv2.calcOpticalFlowFarneback(
-            #             #self.frame0, 
-            #             #self.frame1, 
-            #             #PYR_SCALE, 
-            #             #LEVELS, 
-            #             # WINSIZE, 
-            #             # ITER, 
-            #             # POLY_N, 
-            #             # POLY_SIGMA, 
-            #             # FLAGS)
-            #     pass
-            #     #image = alg.create_flow(self.frame1, flow, 10) #create the flow overlay for display
-            # elif SHOW_DIFF: #Show image difference feed
-            #     image = self.alg.absdiff(self.frame0, self.frame1, self.frame2)
-            #     self.frame0 = self.frame1
-            #     self.frame1 = self.frame2
-            #     self.frame2 = self.camera.get_frame_gray()
-            # else: #Just show regular webcam feed
-            #     image = self.frame0
-            #     self.frame0 = self.camera.get_frame()
-            
-            
-            #self.show_image(image)
 
-            # send scroll event
+            self.update_frames()
             self.alg.calc_scroll(self.dir)
             
+
             key = cv2.waitKey(4)
             if key == 27: 
                 #Quit if the user presses ESC
