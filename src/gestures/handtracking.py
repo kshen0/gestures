@@ -2,6 +2,13 @@
 #-*- coding: utf-8 -*-
 
 """-------------------------------------------------------------------------
+    Implemented bounding boxes for contours, refactored input and debugging code,
+    and translated comments from Spanish to English.
+
+    modifier: Gaby Moreno Cesar
+    contact: morengab@gmail.com
+    last update: 04/23/2013
+
     Control de cursor, click derecho e izquierdo, mediante procesamiento de imágenes.
 
     author:   Yeison Cardona
@@ -225,7 +232,7 @@ class HandTracking:
     # Bounding Box Helpers
     #   
     def getBoundingMidpoints(self, img):
-        """Returns array of points (features) based on bounding boxes"""
+        """Returns array of bounding box midpoints"""
         
         #Process image
         self.run(img)
@@ -253,7 +260,7 @@ class HandTracking:
         diff = dir[0]
         dist = dir[1]
         self.Data["diff vector"] = "(%d, %d)" % (diff[0], diff[1])
-        self.Data["max distance"] = dist
+        self.Data["max distance"] = "%d" % dist
 
 
     #----------------------------------------------------------------------
