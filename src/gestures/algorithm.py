@@ -6,6 +6,7 @@ import math
 
 class Algorithm():
     def __init__(self):
+        
         self.last_scroll_time = None
     
     def absdiff(self, t0, t1, t2):
