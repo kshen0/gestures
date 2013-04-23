@@ -1,0 +1,31 @@
+CIS 192 Final Project
+
+Dependencies
+* OpenCV and OpenCV2: http://opencv.willowgarage.com/wiki/InstallGuide
+* numpy (dependency of opencv)
+* pyobjc: http://pythonhosted.org/pyobjc/
+* pyobjc Quartz framework: https://pypi.python.org/pypi/pyobjc-framework-Quartz
+
+* OpenCV and OpenCV2 were used to capture webcam frames and process the images.
+* numpy, a dependency of opencv, was used for determining vector fields and directinon of movement
+* PyObjC and its Quartz framework were used for handling mouse events
+
+Installation and usage
+* Ensure dependencies are installed
+* Clone the repo at https://github.com/kshen0/gestures and cd to src/gestures
+* run main.py
+* Move your hand up or down to scroll up or down. The scroll direction will behave according to the computer's natural scrolling setting. 
+* The app can scroll any scrollable window under the cursor
+
+Keys
+* Focus the Python app in the dock
+* Press d to toggle debug video feed. This shows the bounding boxes and contours of the areas of the body being tracked.
+* Press esc to quit
+
+Features
+* Skin filtering used for hand detection
+* Bounding boxes used to determine direction and speed of motion
+* Smooth scrolling that is proportional to speed of hand movement
+
+Limitations
+* Skin filter detects anything flesh-colored, including the face and skin-toned objects. This is a minor issue because the app only sends a scroll event if movement speed is above a certain threshold.
