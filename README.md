@@ -7,14 +7,12 @@ CIS 192 Final Project
 
 
 ##Dependencies
-* OpenCV and OpenCV2: http://opencv.willowgarage.com/wiki/InstallGuide
-* numpy (dependency of opencv)
-* pyobjc: http://pythonhosted.org/pyobjc/
-* pyobjc Quartz framework: https://pypi.python.org/pypi/pyobjc-framework-Quartz
+* OpenCV and OpenCV2 must be built via MacPorts, Homebrew, or from source: http://opencv.willowgarage.com/wiki/Mac_OS_X_OpenCV_Port 
+* See requirements.txt for other dependencies
 
 * OpenCV and OpenCV2 were used to capture webcam frames and process the images.
-* numpy, a dependency of opencv, was used for determining vector fields and directinon of movement
-* PyObjC and its Quartz framework were used for handling mouse events
+* numpy was used for determining vector fields and directinon of movement
+* PyObjC and its Quartz framework were used for sending mouse events
 
 
 ##Library
